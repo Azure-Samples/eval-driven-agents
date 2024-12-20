@@ -1,0 +1,4 @@
+azure-ai-inference[opentelemetry]
+python-dotenv
+azure-monitor-opentelemetry
+azure-identity
