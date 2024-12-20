@@ -43,7 +43,7 @@
    .venv\Scripts\activate     # On Windows
    
    # Install dependencies
-   uv pip install .
+   uv pip install -r requirements.txt
    ```
 
    **Using conda**
@@ -53,9 +53,8 @@
    conda activate tracing-demo
    
    # Install dependencies
-   pip install .
+   pip install -r requirements.txt
    ```
-   *(Uses [pyproject.toml](./pyproject.toml) for a modern setup.)*
 
 2. **Create `.env` from Example**  
    ```bash
@@ -65,14 +64,23 @@
    - `ENDPOINT` (from AI Foundry model endpoint page)
    - `API_VERSION` (from AI Foundry model endpoint page)
    - `APP_INSIGHTS_CONNECTION_STRING` (from Application Insights)
+3. **Authenticate with Azure**
+   ```bash
+   # Option 1: Using az cli
+   az login --tenant <your-tenant-id>
+   
+   # Option 2: Using azd
+   azd auth login --tenant-id <your-tenant-id>
+   ```
 
-3. **Run a Sample**  
+4. **Run a Sample**  
    ```bash
    python basic_function_calling.py
    ```
    or  
    ```bash
    python basic_tracing.py
+   ```
    ```
 
 4. **Check Telemetry & Traces**  
@@ -86,7 +94,7 @@
 
 - **`basic_function_calling.py`**: Demonstrates function (tool) calls with full traceability.
 - **`basic_tracing.py`**: Showcases request/response tracing for Q&A scenarios.
+- **`requirements.txt`**: Lists all Python package dependencies.
 - **`.env.example`**: Template for your environment variables—just `cp` & edit.
-- **`pyproject.toml`**: Modern Python packaging for clean dependency management.
 
 Happy Tracing! ✨
