@@ -1,217 +1,148 @@
-import os
-import time
-import random
 import gc
-
+import os
+import random
+import time
 from dotenv import load_dotenv
-load_dotenv()
 
-from azure.ai.inference import ChatCompletionsClient
+from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
-from azure.ai.inference.tracing import AIInferenceInstrumentor
-from azure.monitor.opentelemetry import configure_azure_monitor
 from opentelemetry.trace import get_tracer, get_current_span, SpanKind
 
+load_dotenv()
+
 # --------------------------------------------------------------------------
-# Constants for easy configuration
+# Setup Constants and Config
 # --------------------------------------------------------------------------
 
-# API and authentication related constants
-CREDENTIAL_SCOPES = ["https://cognitiveservices.azure.com/.default"]
+# The model deployment name set in your Azure AI Foundry project.
+# Ensure you've set this in your environment variables.
+MODEL_DEPLOYMENT_NAME = os.getenv("MODEL_DEPLOYMENT_NAME")
+if not MODEL_DEPLOYMENT_NAME:
+    raise ValueError("MODEL_DEPLOYMENT_NAME is not set in the environment.")
 
-# Token limits for requests
-MAX_TOKENS_QUESTION_GENERATION = 150
-MAX_TOKENS_QUESTION_ANSWER = 100
+MAX_TOKENS_QUESTION = 150
+MAX_TOKENS_ANSWER = 100
 
-# Iteration count and client recreation frequency
-MIN_ITERATIONS = 5
-MAX_ITERATIONS = 25
+ITERATION_COUNT = random.randint(5, 10)  # between 5 and 10
 REQUESTS_PER_CLIENT = 5
 
-# Random seed range used to generate unique questions
-SEED_MIN = 1000
-SEED_MAX = 9999
+SEED_RANGE = (1000, 9999)
+SESSION_ID = f"session-{random.randint(1, 99999)}"
 
-# Session ID range
-SESSION_ID_MIN = 1
-SESSION_ID_MAX = 99999
+SLEEP_RANGE = (0.5, 2.0)
 
-# Sleep intervals between requests
-SLEEP_MIN = 0.5
-SLEEP_MAX = 2.0
+# Create a tracer to produce and manage spans.
+tracer = get_tracer(__name__)
 
-# --------------------------------------------------------------------------
-# Functions
-# --------------------------------------------------------------------------
 
-def create_client(endpoint: str, api_version: str) -> ChatCompletionsClient:
+def generate_unique_question(client, seed: str) -> str:
     """
-    Create and return a ChatCompletionsClient instance using DefaultAzureCredential.
+    Generate a unique question based on a seed using the ChatCompletionsClient.
 
-    Parameters
-    ----------
-    endpoint : str
-        The Azure OpenAI endpoint.
-    api_version : str
-        The API version to use for the Azure OpenAI calls.
+    Args:
+        client: The ChatCompletionsClient from your AIProjectClient.
+        seed: The seed string to guide the question generation.
 
-    Returns
-    -------
-    ChatCompletionsClient
-        The inference client configured with default Azure credentials.
-    """
-    return ChatCompletionsClient(
-        endpoint=endpoint,
-        credential=DefaultAzureCredential(exclude_interactive_browser_credential=False),
-        credential_scopes=CREDENTIAL_SCOPES,
-        api_version=api_version
-    )
-
-
-def generate_unique_question(client: ChatCompletionsClient, seed: str) -> str:
-    """
-    Ask the language model to generate a unique question based on a given seed.
-
-    Parameters
-    ----------
-    client : ChatCompletionsClient
-        The inference client to use for completion requests.
-    seed : str
-        A random seed string used to prompt the LLM for a unique question.
-
-    Returns
-    -------
-    str
-        The generated question.
+    Returns:
+        A unique question as a string.
     """
     prompt_messages = [
-        {
-            "role": "system",
-            "content": (
-                "You are a creative assistant. I will provide you a random seed each time. "
-                "Based on that seed, produce a unique and interesting question I could ask "
-                "a large language model. Respond with only the question text, nothing else."
-            )
-        },
+        {"role": "system", "content": "You are a creative assistant. Given a seed, produce a unique question."},
         {"role": "user", "content": f"The seed is: {seed}"}
     ]
-
-    response = client.complete(messages=prompt_messages, max_tokens=MAX_TOKENS_QUESTION_GENERATION)
+    response = client.complete(model=MODEL_DEPLOYMENT_NAME, messages=prompt_messages, max_tokens=MAX_TOKENS_QUESTION)
     question = response.choices[0].message.content.strip()
-
-    # Clean up and force garbage collection
     del response
     gc.collect()
-
     return question
 
 
-def ask_question(client: ChatCompletionsClient, question: str) -> str:
+def ask_question(client, question: str) -> str:
     """
-    Ask the given question to the language model and return the answer.
+    Ask the given question using the ChatCompletionsClient and return the answer.
 
-    Parameters
-    ----------
-    client : ChatCompletionsClient
-        The inference client to use for completion requests.
-    question : str
-        The question to ask the LLM.
+    Args:
+        client: The ChatCompletionsClient from your AIProjectClient.
+        question: The user question string.
 
-    Returns
-    -------
-    str
-        The answer from the LLM.
+    Returns:
+        The model's answer as a string.
     """
     prompt_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": question}
     ]
-
-    response = client.complete(messages=prompt_messages, max_tokens=MAX_TOKENS_QUESTION_ANSWER)
+    response = client.complete(model=MODEL_DEPLOYMENT_NAME, messages=prompt_messages, max_tokens=MAX_TOKENS_ANSWER)
     answer = response.choices[0].message.content.strip()
-
-    # Clean up and force garbage collection
     del response
     gc.collect()
-
     return answer
 
 
-def run_session(client: ChatCompletionsClient, endpoint: str, api_version: str, session_id: str, num_iterations: int) -> None:
+def run_session(project_client: AIProjectClient, client, session_id: str, num_iterations: int):
     """
-    Run the session loop where each iteration:
-    - Generates a random seed.
-    - Requests a unique question from the LLM.
-    - Asks the generated question and prints the answer.
+    Run a session of Q&A. After a certain number of requests, the ChatCompletionsClient is recreated
+    to demonstrate lifecycle changes.
 
-    Parameters
-    ----------
-    client : ChatCompletionsClient
-        The inference client to use for completion requests.
-    endpoint : str
-        The Azure OpenAI endpoint.
-    api_version : str
-        The API version to use for the Azure OpenAI calls.
-    session_id : str
-        The session ID used for telemetry grouping.
-    num_iterations : int
-        The number of iterations (Q&A pairs) to run.
+    Args:
+        project_client: The AIProjectClient connected to your Azure AI Foundry project.
+        client: The current ChatCompletionsClient.
+        session_id: A unique session ID for logging and tracing.
+        num_iterations: Number of Q&A rounds.
     """
     for i in range(num_iterations):
-        seed = str(random.randint(SEED_MIN, SEED_MAX))
-        generated_question = generate_unique_question(client, seed)
-        answer = ask_question(client, generated_question)
-
-        print(f"Iteration {i+1} of {num_iterations}: (Session ID: {session_id})")
-        print("Q:", generated_question)
+        seed = str(random.randint(*SEED_RANGE))
+        question = generate_unique_question(client, seed)
+        answer = ask_question(client, question)
+        print(f"Iteration {i+1}/{num_iterations} [Session: {session_id}]")
+        print("Q:", question)
         print("A:", answer)
         print("---")
 
-        # Periodically recreate the client to free resources
+        # Every few requests, recreate the client to simulate lifecycle changes.
         if (i + 1) % REQUESTS_PER_CLIENT == 0:
             del client
             gc.collect()
-            client = create_client(endpoint, api_version)
+            client = project_client.inference.get_chat_completions_client()
 
-        time.sleep(random.uniform(SLEEP_MIN, SLEEP_MAX))
+        time.sleep(random.uniform(*SLEEP_RANGE))
 
 
 def main():
     """
-    Main entry point of the script:
-    - Reads configuration from environment variables.
-    - Creates a client.
-    - Creates a session span with a unique session_id.
-    - Runs a random number of iterations between MIN_ITERATIONS and MAX_ITERATIONS.
+    Main entry point.
+
+    This example shows how to:
+    1. Connect to an Azure AI Foundry project using AIProjectClient.
+    2. Enable telemetry/tracing automatically with project_client.telemetry.enable().
+    3. Retrieve a traced ChatCompletionsClient for Q&A.
     """
-    # Load environment variables
-    endpoint = os.getenv("ENDPOINT")
-    api_version = os.getenv("API_VERSION")
-    app_insights_connection_string = os.getenv("APP_INSIGHTS_CONNECTION_STRING")
 
-    # Instrument and configure telemetry
-    AIInferenceInstrumentor().instrument(enable_content_recording=False)
-    configure_azure_monitor(connection_string=app_insights_connection_string)
+    project_connection_string = os.getenv("PROJECT_CONNECTION_STRING")
+    if not project_connection_string:
+        raise ValueError("PROJECT_CONNECTION_STRING is not set in the environment.")
 
-    tracer = get_tracer(__name__)
+    # Create and authenticate AIProjectClient.
+    # DefaultAzureCredential will automatically find your credentials (e.g., from 'az login').
+    with AIProjectClient.from_connection_string(
+        credential=DefaultAzureCredential(),
+        conn_str=project_connection_string
+    ) as project_client:
 
-    # Create the initial client
-    client = create_client(endpoint, api_version)
+        # Enable telemetry to automatically configure Application Insights and tracing.
+        project_client.telemetry.enable()
 
-    # Generate a random number of iterations
-    num_iterations = random.randint(MIN_ITERATIONS, MAX_ITERATIONS)
+        # Obtain a ChatCompletionsClient that's already instrumented for tracing.
+        with project_client.inference.get_chat_completions_client() as client:
+            # Start a parent span representing this entire session.
+            with tracer.start_as_current_span("gen-ai-session", kind=SpanKind.CLIENT) as session_span:
+                session_span.set_attribute("session.id", SESSION_ID)
+                current_span = get_current_span()
+                if current_span.is_recording():
+                    current_span.set_attribute("session.id", SESSION_ID)
 
-    # Create a session ID and start a parent session span
-    session_id = f"session-{random.randint(SESSION_ID_MIN, SESSION_ID_MAX)}"
-    with tracer.start_as_current_span("gen-ai-session", kind=SpanKind.CLIENT) as session_span:
-        session_span.set_attribute("session.id", session_id)
-
-        current_span = get_current_span()
-        if current_span.is_recording():
-            current_span.set_attribute("session.id", session_id)
-
-        # Run the main logic
-        run_session(client, endpoint, api_version, session_id, num_iterations)
+                # Run the main logic of generating and asking questions.
+                run_session(project_client, client, SESSION_ID, ITERATION_COUNT)
 
 
 if __name__ == "__main__":

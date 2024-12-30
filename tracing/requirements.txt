@@ -1,3 +1,4 @@
+azure-ai-projects
 azure-ai-inference[opentelemetry]
 python-dotenv
 azure-monitor-opentelemetry
