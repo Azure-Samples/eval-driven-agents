@@ -1,0 +1,68 @@
+---
+name: Engineer Feedback Agent
+description: Analyzes customer interactions to provide engineering insights and recommendations
+version: 1.0.0
+authors:
+  - "GBB"
+model:
+  api: chat
+  configuration:
+    type: azure
+    azure_deployment: ${AZURE_AI_CHAT_DEPLOYMENT_NAME}
+    api_version: ${AZURE_OPENAI_API_VERSION}
+    azure_endpoint: ${AZURE_OPENAI_ENDPOINT}
+  parameters:
+    temperature: 0.7
+    max_tokens: 800
+    response_format: 
+      type: json_object
+inputs:
+  transcript:
+    type: string
+    description: Customer interaction transcript
+    required: true
+  notes:
+    type: string
+    description: Additional notes from the interaction
+    default: ""
+  crmId:
+    type: string
+    description: Microsoft employee ID for context
+    default: ""
+  technical_context:
+    type: string
+    description: Additional technical context from knowledge base search
+    default: ""
+---
+
+system:
+You are an AI assistant specialized in analyzing engineering feedback and technical discussions.
+
+user:
+Please analyze this customer interaction and provide engineering feedback:
+
+Transcript:
+{{transcript}}
+
+Additional Notes:
+{{notes}}
+
+CRM ID: {{crmId}}
+
+{{#if technical_context}}
+Related Technical Context:
+{{technical_context}}
+{{/if}}
+
+assistant:
+I will analyze this interaction from an engineering perspective and provide insights in this JSON format:
+  {
+    "technical_requirements": ["List of identified technical requirements"],
+    "implementation_challenges": ["List of potential challenges"],
+    "architectural_decisions": ["List of key architectural decisions"],
+    "risks": ["List of identified risks"],
+    "recommendations": ["List of technical recommendations"],
+    "summary": "Brief summary of key technical insights"
+  }
+
+  I will maintain technical accuracy and focus on actionable recommendations. If any aspects are unclear, I will indicate this clearly.

@@ -1,0 +1,71 @@
+# Test the API endpoints
+
+### Health Check
+GET http://localhost:8000/health
+
+### Analyze Customer Interaction - Success Case
+POST http://localhost:8000/analyze
+Content-Type: application/json
+
+{
+    "transcript": "Q3VzdG9tZXI6IFdlJ3JlIGhhdmluZyBpc3N1ZXMgd2l0aCB0aGUgQVBJIHJhdGUgbGltaXRzLiBJdCdzIGJsb2NraW5nIG91ciBwcm9kdWN0aW9uIGRlcGxveW1lbnQuClNFOiBJIHVuZGVyc3RhbmQuIENvdWxkIHlvdSB0ZWxsIG1lIG1vcmUgYWJvdXQgdGhlIHNwZWNpZmljIGxpbWl0cyB5b3UncmUgaGl0dGluZz8KQ3VzdG9tZXI6IFdlJ3JlIGdldHRpbmcgdGhyb3R0bGVkIGF0IGFib3V0IDEwMCByZXF1ZXN0cyBwZXIgbWludXRlLCBidXQgd2UgbmVlZCBhdCBsZWFzdCA1MDAgZm9yIG91ciB1c2UgY2FzZS4KU0U6IEdvdCBpdC4gQW5kIGhvdyBpcyB0aGlzIGltcGFjdGluZyB5b3VyIG9wZXJhdGlvbnM/CkN1c3RvbWVyOiBPdXIgZW50aXJlIGRlcGxveW1lbnQgcGlwZWxpbmUgaXMgYmxvY2tlZC4gV2UgYWxzbyBmb3VuZCB0aGUgZG9jdW1lbnRhdGlvbiB1bmNsZWFyIGFib3V0IHRoZXNlIGxpbWl0cy4=",
+    "notes": "LSBDdXN0b21lciBpcyBFbnRlcnByaXNlIHRpZXIKLSBVcmdlbnQgZXNjYWxhdGlvbiBuZWVkZWQKLSBQcmV2aW91cyBpbmNpZGVudHM6IE5vbmUKLSBDdXJyZW50IHBpcGVsaW5lIHN0YWdlOiBJbXBsZW1lbnRhdGlvbg==",
+    "crmId": "12345"
+}
+
+### Analyze Customer Interaction - Missing Transcript
+POST http://localhost:8000/analyze
+Content-Type: application/json
+
+{
+    "notes": "LSBDdXN0b21lciBpcyBFbnRlcnByaXNlIHRpZXIKLSBVcmdlbnQgZXNjYWxhdGlvbiBuZWVkZWQ=",
+    "crmId": "67890"
+}
+
+### Analyze Customer Interaction - Invalid Base64
+POST http://localhost:8000/analyze
+Content-Type: application/json
+
+{
+    "transcript": "not-base64-encoded",
+    "notes": "LSBDdXN0b21lciBpcyBFbnRlcnByaXNlIHRpZXIKLSBVcmdlbnQgZXNjYWxhdGlvbiBuZWVkZWQ=",
+    "crmId": "12345"
+}
+
+### Analyze Customer Interaction - Large Input
+POST http://localhost:8000/analyze
+Content-Type: application/json
+
+{
+    "transcript": "{{$randomString(1000000).toString('base64')}}",
+    "notes": "LSBDdXN0b21lciBpcyBFbnRlcnByaXNlIHRpZXIKLSBVcmdlbnQgZXNjYWxhdGlvbiBuZWVkZWQ=",
+    "crmId": "12345"
+}
+
+### Analyze Customer Interaction - Unknown CRM ID
+POST http://localhost:8000/analyze
+Content-Type: application/json
+
+{
+    "transcript": "Q3VzdG9tZXI6IEhhdmluZyBpc3N1ZXMgd2l0aCBBUEkuClNFOiBDb3VsZCB5b3UgZWxhYm9yYXRlPw==",
+    "notes": "TmV3IGN1c3RvbWVy",
+    "crmId": "99999"
+}
+
+### Analyze Customer Interaction - Minimal Input
+POST http://localhost:8000/analyze
+Content-Type: application/json
+
+{
+    "transcript": "Q3VzdG9tZXI6IEFQSSBpc3N1ZXMuClNFOiBJbnZlc3RpZ2F0aW5nLg=="
+}
+
+### Analyze Customer Interaction - With HTML in Transcript
+POST http://localhost:8000/analyze
+Content-Type: application/json
+
+{
+    "transcript": "PGRpdj5DdXN0b21lcjogV2UgbmVlZCBoZWxwIHdpdGggQVBJIGludGVncmF0aW9uPC9kaXY+PGJyPlNFOiBJIGNhbiBoZWxwIHdpdGggdGhhdA==",
+    "notes": "Q2xlYW4gSFRNTCBmcm9tIHRyYW5zY3JpcHQgbmVlZGVk",
+    "crmId": "12345"
+}

@@ -1,0 +1,16 @@
+system: |
+  You are an AI assistant specialized in analyzing Microsoft employee (CRM) information and providing insights.
+
+user: |
+  Please analyze CRM user information and provide insights in this JSON format:
+  {
+    "name": "Employee's name",
+    "role": "Current role/title",
+    "department": "Department",
+    "expertise": ["List of key areas of expertise"],
+    "achievements": ["Notable achievements"],
+    "insights": "Overall analysis and insights about the employee"
+  }
+
+assistant: |
+  I will analyze the CRM information and provide a structured response. I will maintain professionalism and focus on publicly available information. If no information is found, I will indicate this clearly.

@@ -1,0 +1,81 @@
+---
+name: Customer Story Agent
+description: Analyzes customer interactions to extract key story elements and insights
+authors:
+  - "GBB"
+model:
+  api: chat
+  configuration:
+    type: azure
+    azure_deployment: ${AZURE_AI_CHAT_DEPLOYMENT_NAME}
+    api_version: "2024-02-15-preview"
+    azure_endpoint: ${AZURE_OPENAI_ENDPOINT}
+parameters:
+  max_tokens: 1024
+  temperature: 0.3
+  response_format:
+    type: json_object
+    schema:
+      type: object
+      properties:
+        customer_background:
+          type: string
+          description: "Background information about the customer"
+        key_points:
+          type: array
+          items:
+            type: string
+          description: "List of key points from the interaction"
+        sentiment:
+          type: string
+          description: "Overall customer sentiment (positive, neutral, negative)"
+        action_items:
+          type: array
+          items:
+            type: string
+          description: "List of recommended actions"
+        summary:
+          type: string
+          description: "Brief summary of key insights"
+      required: ["customer_background", "key_points", "sentiment", "action_items", "summary"]
+inputs:
+  transcript:
+    type: string
+    description: "The customer interaction transcript"
+    default: ""
+  notes:
+    type: string
+    description: "Additional notes about the interaction"
+    default: ""
+  crm_id:
+    type: string
+    description: "CRM ID for additional context"
+    default: ""
+  additional_context:
+    type: string
+    description: "Additional context from knowledge base search"
+    default: ""
+---
+
+system:
+You are an AI assistant specialized in analyzing customer stories and feedback to extract key insights and patterns.
+
+user:
+Please analyze the following customer interaction:
+
+Transcript: {{transcript}}
+Notes: {{notes}}
+CRM ID: {{crm_id}}
+{{additional_context}}
+
+assistant:
+I will analyze this customer interaction and provide insights in this JSON format:
+  {
+    "customer_background": "Background information about the customer",
+    "key_points": ["List of key points from the interaction, including technical issues like API rate limits"],
+    "sentiment": "positive/neutral/negative",
+    "action_items": ["List of recommended actions"],
+    "summary": "Brief summary of key insights"
+  }
+
+  I will maintain professionalism and focus on actionable insights. If no clear patterns emerge, I will indicate this clearly.
