@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+python-dotenv
+azure-ai-projects
+azure-identity
+azure-core
+openai
+promptflow

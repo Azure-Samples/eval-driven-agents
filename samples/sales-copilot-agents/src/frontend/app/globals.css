@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 100%;
+    --border: 0 0% 15%;
+  }
+}
+
+body {
+  background-color: #111111;
+  color: white;
+}
+
+@layer utilities {
+  .animate-in {
+    animation: slideIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .animate-out {
+    animation: slideOut 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+  
+  @keyframes slideOut {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100%); }
+  }
+} 

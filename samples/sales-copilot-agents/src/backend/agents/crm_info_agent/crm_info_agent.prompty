@@ -1,0 +1,50 @@
+---
+name: CRM Info Agent
+description: An agent that processes and analyzes CRM user information to provide relevant insights
+authors:
+  - "GBB"
+
+model:
+  api: chat
+  configuration:
+    type: azure
+    azure_deployment: ${AZURE_AI_CHAT_DEPLOYMENT_NAME}
+    api_version: ${AZURE_OPENAI_API_VERSION}
+    azure_endpoint: ${AZURE_OPENAI_ENDPOINT}
+  parameters:
+    max_tokens: 512
+    temperature: 0.2
+    response_format:
+      type: json_object
+
+inputs:
+  crm_id:
+    type: string
+    description: "The CRM ID of the user to analyze"
+    required: true
+  user_context:
+    type: string
+    description: "Additional context about the user from CRM database"
+    required: false
+    default: "No additional context provided."
+---
+
+system:
+You are an AI assistant specialized in analyzing CRM information and providing insights.
+
+user:
+Please analyze the following CRM user information:
+{{user_context}}
+
+assistant:
+I will analyze the CRM information for CRM ID {{crm_id}} and provide insights in this JSON format:
+  {
+    "name": "Employee's name",
+    "role": "Current role/title",
+    "department": "Department",
+    "expertise": ["List of key areas of expertise"],
+    "achievements": ["Notable achievements"],
+    "insights": "Overall analysis and insights about the employee"
+  }
+
+  I will maintain professionalism and focus on publicly available information. If no information is found, I will indicate this clearly.

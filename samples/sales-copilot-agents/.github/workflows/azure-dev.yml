@@ -1,0 +1,81 @@
+name: Azure Developer CLI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install azd
+        uses: Azure/setup-azd@v0.1.0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: src/frontend/package-lock.json
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: |
+            src/api/requirements.txt
+            requirements-dev.txt
+      
+      - name: Install dependencies
+        run: |
+          cd src/frontend && npm install
+          cd ../api && pip install -r requirements.txt
+          cd ../.. && pip install -r requirements-dev.txt
+      
+      - name: Lint
+        run: |
+          cd src/frontend && npm run lint
+          cd ../api && ruff check . && ruff format --check .
+      
+      - name: Build frontend
+        run: cd src/frontend && npm run build
+      
+      - name: Log in with Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Configure Azure Developer CLI
+        run: |
+          azd config set defaults.deploy.containerapp.remote_build true
+          
+      - name: Azure Developer CLI - Provision
+        run: azd provision --no-prompt
+        
+      - name: Azure Developer CLI - Deploy API
+        run: azd deploy api --no-prompt
+        
+      - name: Azure Developer CLI - Deploy Frontend
+        run: azd deploy frontend --no-prompt
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
+          AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+          AZURE_AIPROJECT_CONNECTION_STRING: ${{ secrets.AZURE_AIPROJECT_CONNECTION_STRING }}
+          AZURE_AI_CHAT_DEPLOYMENT_NAME: ${{ secrets.AZURE_AI_CHAT_DEPLOYMENT_NAME }}
+          AZURE_AI_EMBED_DEPLOYMENT_NAME: ${{ secrets.AZURE_AI_EMBED_DEPLOYMENT_NAME }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          BING_API_KEY: ${{ secrets.BING_API_KEY }}
+          API_VERSION: ${{ secrets.API_VERSION }}
+          AZURE_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
+          AZURE_AD_TOKEN_PROVIDER: ${{ secrets.AZURE_AD_TOKEN_PROVIDER }}
+          MODEL: ${{ secrets.MODEL }}

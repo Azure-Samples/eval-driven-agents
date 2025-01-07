@@ -1,0 +1,27 @@
+name: Template Validation
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Bicep CLI
+        run: |
+          curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+          chmod +x ./bicep
+          sudo mv ./bicep /usr/local/bin/bicep
+          
+      - name: Validate Bicep templates
+        run: |
+          for f in $(find . -name '*.bicep'); do
+            echo "Validating $f"
+            bicep build $f --stdout > /dev/null
+          done
