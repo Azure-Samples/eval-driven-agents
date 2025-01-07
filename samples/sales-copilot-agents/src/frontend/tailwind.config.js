@@ -18,9 +18,9 @@ module.exports = {
           foreground: "#ffffff"
         },
         accent: {
-          cyan: "#00FFC8",
-          blue: "#00AFFF",
-          magenta: "#FF00FF"
+          cyan: "#94A3B8",
+          blue: "#64748B",
+          magenta: "#475569"
         }
       },
       keyframes: {

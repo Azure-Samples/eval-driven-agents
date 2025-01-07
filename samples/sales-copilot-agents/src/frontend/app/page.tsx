@@ -54,10 +54,10 @@ interface ReportData {
 
 // Update the color constants for better reuse
 const colors = {
-  primary: '#00AFFF', // Bright blue
-  secondary: '#4ECDC4', // Turquoise
-  accent: '#0090FF', // Darker blue for hover
-  background: '#111111',
+  primary: '#94A3B8', // Slate gray
+  secondary: '#64748B', // Darker slate
+  accent: '#475569', // Deep slate for hover states
+  background: '#111111', // Keeping dark background
   cardBg: '#1f1f1f',
   inputBg: '#2a2a2a',
 }
@@ -186,24 +186,24 @@ export default function RapidReportGenerator() {
           <div className="flex items-center gap-3 mb-2">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
               {/* Core module */}
-              <rect x="12" y="12" width="16" height="16" fill="#1f1f1f" stroke="#00AFFF" strokeWidth="2"/>
+              <rect x="12" y="12" width="16" height="16" fill="#1f1f1f" stroke="#94A3B8" strokeWidth="2"/>
               {/* Extension connectors */}
-              <path d="M28 20H36" stroke="#00AFFF" strokeWidth="2"/>
-              <path d="M4 20H12" stroke="#00AFFF" strokeWidth="2"/>
-              <path d="M20 28V36" stroke="#00AFFF" strokeWidth="2"/>
-              <path d="M20 4V12" stroke="#00AFFF" strokeWidth="2"/>
+              <path d="M28 20H36" stroke="#94A3B8" strokeWidth="2"/>
+              <path d="M4 20H12" stroke="#94A3B8" strokeWidth="2"/>
+              <path d="M20 28V36" stroke="#94A3B8" strokeWidth="2"/>
+              <path d="M20 4V12" stroke="#94A3B8" strokeWidth="2"/>
               {/* Extension modules */}
-              <circle cx="36" cy="20" r="3" fill="#4ECDC4"/>
-              <circle cx="4" cy="20" r="3" fill="#4ECDC4"/>
-              <circle cx="20" cy="36" r="3" fill="#4ECDC4"/>
-              <circle cx="20" cy="4" r="3" fill="#4ECDC4"/>
+              <circle cx="36" cy="20" r="3" fill="#64748B"/>
+              <circle cx="4" cy="20" r="3" fill="#64748B"/>
+              <circle cx="20" cy="36" r="3" fill="#64748B"/>
+              <circle cx="20" cy="4" r="3" fill="#64748B"/>
               {/* Pulse dots */}
-              <circle cx="28" cy="20" r="1" fill="#4ECDC4"/>
-              <circle cx="12" cy="20" r="1" fill="#4ECDC4"/>
-              <circle cx="20" cy="28" r="1" fill="#4ECDC4"/>
-              <circle cx="20" cy="12" r="1" fill="#4ECDC4"/>
+              <circle cx="28" cy="20" r="1" fill="#64748B"/>
+              <circle cx="12" cy="20" r="1" fill="#64748B"/>
+              <circle cx="20" cy="28" r="1" fill="#64748B"/>
+              <circle cx="20" cy="12" r="1" fill="#64748B"/>
             </svg>
-            <h1 className="text-4xl font-bold text-[#00AFFF] tracking-wide">Microsoft 365 Copilot for Sales extensions</h1>
+            <h1 className="text-4xl font-bold text-[#94A3B8] tracking-wide">Microsoft 365 Copilot for Sales extensions</h1>
           </div>
           <p className="text-center text-gray-400">Synthesize customer feedback into actionable insights</p>
         </div>
@@ -212,9 +212,9 @@ export default function RapidReportGenerator() {
         <div className="flex gap-8 max-w-[1800px] mx-auto">
           {/* Left side forms with updated colors */}
           <div className="w-1/2 space-y-6">
-            <Card className="bg-[#1f1f1f] border-[#00AFFF] hover:shadow-[0_0_10px_rgba(0,175,255,0.3)] transition-shadow duration-300">
+            <Card className="bg-[#1f1f1f] border-[#94A3B8] hover:shadow-[0_0_10px_rgba(148,163,184,0.3)] transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-[#00AFFF] flex items-center gap-2">
+                <CardTitle className="text-[#94A3B8] flex items-center gap-2">
                   <FileText className="h-6 w-6" />
                   Metadata
                 </CardTitle>
@@ -222,16 +222,16 @@ export default function RapidReportGenerator() {
               <CardContent>
                 <Input
                   placeholder="CRM references (Dynamics 365, Salesforce, etc.), pipeline stage ..."
-                  className="bg-[#2a2a2a] border-[#00AFFF] focus:ring-[#00AFFF] text-white placeholder:text-gray-400"
+                  className="bg-[#2a2a2a] border-[#94A3B8] focus:ring-[#94A3B8] text-white placeholder:text-gray-400"
                   value={salesNotes}
                   onChange={(e) => setSalesNotes(e.target.value)}
                 />
               </CardContent>
             </Card>
             
-            <Card className="bg-[#1f1f1f] border-[#00AFFF] hover:shadow-[0_0_10px_rgba(0,175,255,0.3)] transition-shadow duration-300">
+            <Card className="bg-[#1f1f1f] border-[#94A3B8] hover:shadow-[0_0_10px_rgba(148,163,184,0.3)] transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-[#00AFFF] flex items-center gap-2">
+                <CardTitle className="text-[#94A3B8] flex items-center gap-2">
                   <MessageSquare className="h-6 w-6" />
                   Meeting transcripts (Teams, Zoom etc.)
                 </CardTitle>
@@ -239,16 +239,16 @@ export default function RapidReportGenerator() {
               <CardContent>
                 <Textarea
                   placeholder="Paste or type raw transcript here..."
-                  className="min-h-[150px] bg-[#2a2a2a] border-[#00AFFF] focus:ring-[#00AFFF] text-white placeholder:text-gray-400"
+                  className="min-h-[150px] bg-[#2a2a2a] border-[#94A3B8] focus:ring-[#94A3B8] text-white placeholder:text-gray-400"
                   value={customerFeedback}
                   onChange={(e) => setCustomerFeedback(e.target.value)}
                 />
               </CardContent>
             </Card>
 
-            <Card className="bg-[#1f1f1f] border-[#00AFFF] hover:shadow-[0_0_10px_rgba(0,175,255,0.3)] transition-shadow duration-300">
+            <Card className="bg-[#1f1f1f] border-[#94A3B8] hover:shadow-[0_0_10px_rgba(148,163,184,0.3)] transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-[#00AFFF] flex items-center gap-2">
+                <CardTitle className="text-[#94A3B8] flex items-center gap-2">
                   <StickyNote className="h-6 w-6" />
                   Additional notes
                 </CardTitle>
@@ -256,7 +256,7 @@ export default function RapidReportGenerator() {
               <CardContent>
                 <Textarea
                   placeholder="Use bullet points or free-form text..."
-                  className="min-h-[150px] bg-[#2a2a2a] border-[#00AFFF] focus:ring-[#00AFFF] text-white placeholder:text-gray-400"
+                  className="min-h-[150px] bg-[#2a2a2a] border-[#94A3B8] focus:ring-[#94A3B8] text-white placeholder:text-gray-400"
                   value={customerContext}
                   onChange={(e) => setCustomerContext(e.target.value)}
                 />
@@ -270,7 +270,7 @@ export default function RapidReportGenerator() {
                     <Button
                       onClick={handleGenerateReport}
                       disabled={isGenerating || !isFormValid}
-                      className="w-full bg-[#00AFFF] text-white hover:bg-[#0090FF] transition-all duration-300 text-xl px-8 py-4 rounded-lg shadow-lg hover:shadow-[0_0_30px_rgba(0,175,255,0.5)] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                      className="w-full bg-[#94A3B8] text-white hover:bg-[#64748B] transition-all duration-300 text-xl px-8 py-4 rounded-lg shadow-lg hover:shadow-[0_0_30px_rgba(148,163,184,0.5)] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                     >
                       {isGenerating ? (
                         <Loader2 className="h-6 w-6 animate-spin" />
@@ -297,19 +297,19 @@ export default function RapidReportGenerator() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col items-center justify-center min-h-[200px] bg-[#1f1f1f] rounded-lg border border-[#00AFFF] p-6"
+                    className="flex flex-col items-center justify-center min-h-[200px] bg-[#1f1f1f] rounded-lg border border-[#94A3B8] p-6"
                   >
-                    <Loader2 className="h-8 w-8 animate-spin text-[#00AFFF] mb-4" />
+                    <Loader2 className="h-8 w-8 animate-spin text-[#94A3B8] mb-4" />
                     <div className="space-y-2 text-center">
-                      <h3 className="text-lg font-semibold text-[#00AFFF]">Generating Report</h3>
+                      <h3 className="text-lg font-semibold text-[#94A3B8]">Generating Report</h3>
                       <div className="space-y-1 text-gray-400">
-                        <p className={progress.crmInfo ? "text-[#00AFFF]" : ""}>
+                        <p className={progress.crmInfo ? "text-[#94A3B8]" : ""}>
                           {progress.crmInfo ? "✓" : "○"} Retrieving customer information...
                         </p>
-                        <p className={progress.customerStory ? "text-[#00AFFF]" : ""}>
+                        <p className={progress.customerStory ? "text-[#94A3B8]" : ""}>
                           {progress.customerStory ? "✓" : "○"} Analyzing customer story...
                         </p>
-                        <p className={progress.engineeringFeedback ? "text-[#00AFFF]" : ""}>
+                        <p className={progress.engineeringFeedback ? "text-[#94A3B8]" : ""}>
                           {progress.engineeringFeedback ? "✓" : "○"} Generating engineering feedback...
                         </p>
                       </div>
@@ -326,9 +326,9 @@ export default function RapidReportGenerator() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <Card className="bg-[#1f1f1f] border-[#00AFFF]">
+                    <Card className="bg-[#1f1f1f] border-[#94A3B8]">
                       <CardHeader>
-                        <CardTitle className="text-[#00AFFF] flex items-center gap-2">
+                        <CardTitle className="text-[#94A3B8] flex items-center gap-2">
                           <User className="h-6 w-6" />
                           Customer Information
                         </CardTitle>
@@ -361,17 +361,17 @@ export default function RapidReportGenerator() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                   >
-                    <Card className="bg-[#1f1f1f] border-[#00AFFF]">
+                    <Card className="bg-[#1f1f1f] border-[#94A3B8]">
                       <CardHeader>
-                        <CardTitle className="text-[#00AFFF]">Customer Story Analysis</CardTitle>
+                        <CardTitle className="text-[#94A3B8]">Customer Story Analysis</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-2">
-                          <h3 className="text-[#00AFFF] font-semibold">Background</h3>
+                          <h3 className="text-[#94A3B8] font-semibold">Background</h3>
                           <p className="text-gray-300">{reportData.customerStory?.background}</p>
                         </div>
                         <div className="space-y-2">
-                          <h3 className="text-[#00AFFF] font-semibold">Key Points</h3>
+                          <h3 className="text-[#94A3B8] font-semibold">Key Points</h3>
                           <ul className="list-disc list-inside text-gray-300">
                             {reportData.customerStory?.keyPoints.map((point, i) => (
                               <li key={i}>{point}</li>
@@ -379,7 +379,7 @@ export default function RapidReportGenerator() {
                           </ul>
                         </div>
                         <div className="space-y-2">
-                          <h3 className="text-[#00AFFF] font-semibold">Action Items</h3>
+                          <h3 className="text-[#94A3B8] font-semibold">Action Items</h3>
                           <ul className="list-disc list-inside text-gray-300">
                             {reportData.customerStory?.actionItems.map((item, i) => (
                               <li key={i}>{item}</li>
@@ -397,17 +397,17 @@ export default function RapidReportGenerator() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5, delay: 0.4 }}
                   >
-                    <Card className="bg-[#1f1f1f] border-[#00AFFF]">
+                    <Card className="bg-[#1f1f1f] border-[#94A3B8]">
                       <CardHeader>
-                        <CardTitle className="text-[#00AFFF]">Engineering Feedback</CardTitle>
+                        <CardTitle className="text-[#94A3B8]">Engineering Feedback</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-2">
-                          <h3 className="text-[#00AFFF] font-semibold">Analysis</h3>
+                          <h3 className="text-[#94A3B8] font-semibold">Analysis</h3>
                           <p className="text-gray-300">{reportData.engineeringFeedback?.feedback}</p>
                         </div>
                         <div className="space-y-2">
-                          <h3 className="text-[#00AFFF] font-semibold">Action Items</h3>
+                          <h3 className="text-[#94A3B8] font-semibold">Action Items</h3>
                           <ul className="list-disc list-inside text-gray-300">
                             {reportData.engineeringFeedback?.actionItems.map((item, i) => (
                               <li key={i}>{item}</li>
@@ -415,7 +415,7 @@ export default function RapidReportGenerator() {
                           </ul>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[#00AFFF] font-semibold">Priority:</span>
+                          <span className="text-[#94A3B8] font-semibold">Priority:</span>
                           <span className="text-gray-300">{reportData.engineeringFeedback?.priority}</span>
                         </div>
                       </CardContent>
